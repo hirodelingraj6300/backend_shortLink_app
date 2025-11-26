@@ -2,27 +2,29 @@
 require('dotenv').config();
 const mysql = require('mysql2/promise');
 
+if (!process.env.DATABASE_URL) {
+  console.error("❌ Missing DATABASE_URL");
+  process.exit(1);
+}
+
 const pool = mysql.createPool({
-  uri: process.env.DATABASE_URL, // if your DB provider gives a full URI
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  port: process.env.DB_PORT ? Number(process.env.DB_PORT) : 3306,
+  uri: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: true
+  },
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
 });
 
+// Test connection (optional)
 async function testConnection() {
   try {
-    const conn = await pool.getConnection();
-    await conn.ping();
-    conn.release();
-    console.log('✅ MySQL connection OK');
+    await pool.query("SELECT 1");
+    console.log("✅ MySQL connection OK");
   } catch (err) {
-    console.error('❌ MySQL connection error:', err.message || err);
-    throw err;
+    console.error("❌ MySQL connection failed:", err.message);
+    process.exit(1);
   }
 }
 
