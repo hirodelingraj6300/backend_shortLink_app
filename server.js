@@ -1,8 +1,24 @@
 require("dotenv").config();
 const express = require("express");
+const cors = require("cors");             // << ADD THIS
 const { pool, testConnection } = require("./config/db");
 
 const app = express();
+
+// ====== CORS FIX (SUPER IMPORTANT) ======
+app.use(
+  cors({
+    origin: "*", // allow all (frontend → backend)
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type"],
+  })
+);
+
+// Handle OPTIONS preflight
+app.options("*", cors());
+
+// ========================================
+
 app.use(express.json());
 
 // Test route
