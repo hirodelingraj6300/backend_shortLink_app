@@ -21,6 +21,12 @@ app.use(express.json());
 app.use("/api/links", linksRouter);
 app.use("/", redirectRouter);
 
+// Health check route
+app.get("/api/healthz", (req, res) => {
+  res.status(200).json({ ok: true, status: "healthy" });
+});
+
+
 // Test route
 app.get("/test-db", async (req, res) => {
   try {
